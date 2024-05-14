@@ -5,7 +5,7 @@ import { ListItem } from './components/ListItem';
 import { AddArea } from './components/AddArea';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/tarefas'; // Substitua pelo URL do seu backend
+const API_URL = 'http://tarefas-env.eba-yq6sdhxt.us-east-2.elasticbeanstalk.com'; // Substitua pelo URL do seu backend
 
 
 export const getDados = async () => {
