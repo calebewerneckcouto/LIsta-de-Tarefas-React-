@@ -7,6 +7,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8080/tarefas'; // Substitua pelo URL do seu backend
 
+
 export const getDados = async () => {
   try {
     const response = await axios.get(`${API_URL}/lista`);
@@ -44,6 +45,7 @@ export const deleteDados = async (id: number) => {
 
 const App = () => {
   const [list, setList] = useState<Item[]>([]);
+  const [status, setStatus] = useState(false); // Corrigido: inicialização do estado status
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,16 +76,33 @@ const App = () => {
     }
   };
 
-  const handleTaskChange = (id: number, done: boolean) => {
+  const handleTaskChange = async (id: number, done: boolean) => {
   let newList = [...list];
+  let taskIndex = -1; // Adiciona uma variável para armazenar o índice da tarefa atualizada
+
   for (let i = 0; i < newList.length; i++) {
     if (newList[i].id === id) {
       newList[i].done = done;
+      taskIndex = i; // Armazena o índice da tarefa atualizada
     }
   }
-  setList(newList);
-};
 
+  setList(newList);
+
+  // Atualiza o backend com o novo estado do checkbox
+  if (taskIndex!== -1) { // Verifica se a tarefa foi encontrada
+    try {
+      await adicionarDados(id, newList[taskIndex].name, done);
+      // Recarrega a lista após a atualização bem-sucedida no backend
+      const updatedData = await getDados();
+      setList(updatedData);
+    } catch (error) {
+      console.error("Erro ao atualizar tarefa:", error);
+      // Opção para remover a tarefa da lista local se a atualização falhar
+      // setList(newList.filter(task => task.id!== id));
+    }
+  }
+};
 
   const handleDeleteTask = async (id: number) => {
     try {
@@ -103,7 +122,7 @@ const App = () => {
           <ListItem
             key={index}
             item={item}
-            onChange={(done) => handleTaskChange(item.id, false)} // Ajuste aqui para passar o estado atual do checkbox
+            onChange={(done) => handleTaskChange(item.id,!item.done)} // Ajuste aqui para passar o inverso do estado atual do checkbox
             onDelete={() => handleDeleteTask(item.id)} // Passando a função para deletar a tarefa
           />
         ))}
