@@ -9,7 +9,14 @@ export const AddArea = ({ onEnter }: Props) => {
     const [inputText, setInputText] = useState('');
 
     const handleKeyUp = (e: KeyboardEvent) => {
-        if(e.code === 'Enter' && inputText !== '') {
+        if(e.code === 'Enter' && inputText!== '') {
+            onEnter(inputText);
+            setInputText('');
+        }
+    }
+
+    const handleBlur = () => {
+        if (inputText!== '') {
             onEnter(inputText);
             setInputText('');
         }
@@ -24,6 +31,7 @@ export const AddArea = ({ onEnter }: Props) => {
                 value={inputText}
                 onChange={e=>setInputText(e.target.value)}
                 onKeyUp={handleKeyUp}
+                onBlur={handleBlur} // Adiciona o evento onBlur
             />
         </C.Container>
     );
